@@ -15,3 +15,9 @@ docker compose up -d --build
 ```bash
 docker compose exec backend python manage.py migrate
 ```
+
+## Admin
+
+```bash
+docker compose exec backend python manage.py createsuperuser
+```
