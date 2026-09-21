@@ -1,7 +1,15 @@
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 
-from .views import health_check
+from .views import CategoryViewSet, BrandViewSet
+
+
+router = DefaultRouter()
+
+router.register("categories", CategoryViewSet, basename="category")
+router.register("brands", BrandViewSet, basename="brand")
+
 
 urlpatterns = [
-    path('health/', health_check, name='health-check'),
+    path("", include(router.urls)),
 ]
