@@ -138,6 +138,11 @@ After changes, briefly report:
 - what was checked
 - what was not checked
 
+For frontend work, also state whether the changes belong to:
+- functional pass;
+- design pass;
+- or both, if the user explicitly requested both in one task.
+
 ## 5. Backend conventions
 
 Keep Django views thin:
@@ -309,6 +314,92 @@ web/src/app/
 
 Do not restructure existing code only to match this layout.
 
+### Frontend workflow: functional pass -> design pass
+
+Frontend tasks are implemented in two separate sequential passes.
+
+#### 1. Functional pass
+
+The functional pass is responsible for application behavior and Angular architecture.
+
+Use the project rules and, when available, the official Angular CLI MCP as the primary guidance for Angular implementation.
+
+The functional pass may implement or change:
+- frontend API types and contracts;
+- data-access services;
+- HTTP requests and query params;
+- routing;
+- application and local state;
+- signals and computed state;
+- reactive forms and validation;
+- loading, empty, and error states;
+- SSR/hydration-safe behavior;
+- accessibility semantics required for correct application behavior;
+- presentational markup only to the minimum level required for a usable implementation.
+
+During the functional pass:
+- prioritize correctness, maintainability, and the real backend contract;
+- keep visual styling simple and neutral;
+- do not spend time on decorative polish unless it is required by the task;
+- do not add fake data or visual-only fallback behavior.
+
+#### 2. Design pass
+
+The design pass starts only after the functional implementation exists.
+
+Design-oriented skills, MCP servers, agents, or other design tools are used only for visual and UX refinement.
+
+The design pass may change:
+- page composition and layout;
+- Tailwind utility classes;
+- typography;
+- spacing;
+- sizing;
+- visual hierarchy;
+- responsive presentation;
+- borders, backgrounds, shadows, and other visual styling;
+- presentational markup;
+- visual accessibility, focus states, and responsive behavior;
+- purely visual motion/interactions when already compatible with the approved task and existing dependencies.
+
+The design pass must not change:
+- backend API contracts or endpoints;
+- frontend API types to fit a design;
+- data-access services;
+- HTTP/query behavior;
+- routes or route semantics;
+- application/business state;
+- business rules or validation;
+- loading/error/empty behavior;
+- backend code;
+- database models;
+- dependency lists;
+- Angular architecture;
+- SSR/hydration behavior;
+- existing functional behavior.
+
+By default, design tools should not modify TypeScript application logic.
+
+If a requested visual or UX improvement requires a change to TypeScript behavior, routing, state, API contracts, dependencies, or application architecture, stop and report the required change before implementing it.
+
+Do not let a design tool rewrite working functional code merely to match its preferred framework or architecture.
+
+### Tool and instruction precedence
+
+For frontend work, use this priority order:
+
+1. Current task requirements.
+2. `AGENTS.md` and approved project architecture.
+3. Real backend/API contracts.
+4. Official Angular CLI MCP guidance for Angular implementation.
+5. Design skills/tools for visual refinement only.
+
+If a design skill recommends React, Next.js, React hooks, React-specific libraries, UI libraries, new dependencies, or patterns that conflict with Angular/project rules, ignore those recommendations.
+
+Design tools must adapt to the existing Angular + Tailwind implementation, not the other way around.
+
+Do not introduce a UI library, design system, custom design tokens, animation library, icon library, or other dependency merely because a design tool recommends it. Such changes require a separate explicit project decision.
+
 ## 12. Frontend/backend communication
 
 Angular must call backend APIs through relative `/api/...` paths.
@@ -342,3 +433,7 @@ When multiple approaches exist:
 3. do not implement alternatives unless requested.
 
 Balance clean architecture, best practices, and future extensibility without adding unnecessary complexity too early.
+
+For frontend tasks, functional implementation and visual design are separate passes. A design pass must preserve the approved functional behavior.
+
+If a design improvement requires functional or architectural changes, treat those changes as a separate decision rather than silently including them in the design pass.
