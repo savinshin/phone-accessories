@@ -22,3 +22,5 @@ web/.angular/
 # PDF
 PHONE_ACCESSORIES_CATALOG_TASKS.pdf
 phone-accessories-catalog-schema.pdf
+# Playwright CLI output (may contain credentials)
+.playwright-cli/
