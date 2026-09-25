@@ -51,13 +51,12 @@ codex mcp list
 ### Impeccable:
 
 ```bash
-npx impeccable install --providers=codex --scope=project
+.agents/skills/impeccable/scripts/impeccable doctor
 ```
 
 ### Playwright CLI:
 
 ```bash
 npm install -g @playwright/cli@latest
-playwright-cli install --skills=agents
 playwright-cli install-browser chrome
 ```
