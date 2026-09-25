@@ -18,3 +18,7 @@ web/.angular/
 .DS_Store
 .vscode/
 .idea/
+
+# PDF
+PHONE_ACCESSORIES_CATALOG_TASKS.pdf
+phone-accessories-catalog-schema.pdf
