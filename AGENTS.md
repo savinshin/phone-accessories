@@ -107,6 +107,10 @@ Do not run without explicit user approval:
 - Docker commands that change container state
 - tests or test modifications
 
+Frontend Angular `*.spec.ts`:
+- Do not create, restore, maintain, or modify these files; generated `*.spec.ts` files must not remain in the project.
+- Angular unit tests are not mandatory checks and must not be run.
+
 Allowed read-only/safe checks:
 - `ls`
 - `find`
@@ -296,6 +300,10 @@ Angular conventions:
 - strict TypeScript/templates
 - Tailwind CSS
 - minimal component CSS
+
+Frontend tests:
+- Angular `*.spec.ts` files are not used. Do not create, restore, maintain, or modify them, and do not propose `*.spec.ts` unit tests for ordinary frontend tasks.
+- A frontend unit-test strategy may be adopted only by a separate explicit project decision. This rule applies only to Angular `*.spec.ts` and does not prohibit backend tests or another future test strategy.
 
 Do not introduce UI libraries, design systems, or custom design tokens without a project decision.
 
