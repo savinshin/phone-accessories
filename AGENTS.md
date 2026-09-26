@@ -300,6 +300,8 @@ Angular conventions:
 - strict TypeScript/templates
 - Tailwind CSS
 - minimal component CSS
+- Keep Angular component TypeScript and HTML templates in separate files: every component must use `templateUrl` and must not use inline `template`.
+- This applies to page and reusable/UI components; a design pass must not move HTML back into TypeScript.
 
 Frontend tests:
 - Angular `*.spec.ts` files are not used. Do not create, restore, maintain, or modify them, and do not propose `*.spec.ts` unit tests for ordinary frontend tasks.
