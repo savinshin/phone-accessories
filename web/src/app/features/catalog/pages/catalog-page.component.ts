@@ -1,0 +1,122 @@
+import { ChangeDetectionStrategy, Component, DestroyRef, afterNextRender, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { RouterLink } from '@angular/router';
+import { forkJoin } from 'rxjs';
+
+import { CatalogApiService } from '../data-access/catalog-api.service';
+import { Brand, Category } from '../data-access/catalog.types';
+import { CatalogStateComponent } from '../ui/catalog-state.component';
+
+@Component({
+  selector: 'app-catalog-page',
+  imports: [RouterLink, CatalogStateComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `
+    <main class="mx-auto max-w-3xl p-6">
+      <h1 class="text-2xl font-semibold text-slate-900">Catalog</h1>
+
+      @if (isLoading()) {
+        <div class="mt-6">
+          <app-catalog-state kind="loading" message="Loading catalog..." />
+        </div>
+      } @else if (hasError()) {
+        <div class="mt-6">
+          <app-catalog-state kind="error" message="Unable to load the catalog." />
+        </div>
+      } @else if (isEmpty()) {
+        <div class="mt-6">
+          <app-catalog-state kind="empty" message="The catalog is empty." />
+        </div>
+      } @else {
+        <div class="mt-8 grid gap-8 md:grid-cols-2">
+          <section aria-labelledby="catalog-categories-heading">
+            <h2 id="catalog-categories-heading" class="text-lg font-medium text-slate-900">
+              Categories
+            </h2>
+
+            @if (categories().length) {
+              <ul class="mt-3 space-y-3">
+                @for (category of categories(); track category.id) {
+                  <li>
+                    <a
+                      class="block text-slate-900 underline"
+                      [routerLink]="['/catalog/categories', category.slug]"
+                    >
+                      {{ category.name }}
+                    </a>
+                    @if (category.description) {
+                      <p class="mt-1 text-sm text-slate-600">{{ category.description }}</p>
+                    }
+                  </li>
+                }
+              </ul>
+            } @else {
+              <div class="mt-3">
+                <app-catalog-state kind="empty" message="No categories are available." />
+              </div>
+            }
+          </section>
+
+          <section aria-labelledby="catalog-brands-heading">
+            <h2 id="catalog-brands-heading" class="text-lg font-medium text-slate-900">
+              Brands
+            </h2>
+
+            @if (brands().length) {
+              <ul class="mt-3 space-y-3">
+                @for (brand of brands(); track brand.id) {
+                  <li>
+                    <a
+                      class="block text-slate-900 underline"
+                      [routerLink]="['/catalog/brands', brand.slug]"
+                    >
+                      {{ brand.name }}
+                    </a>
+                    @if (brand.description) {
+                      <p class="mt-1 text-sm text-slate-600">{{ brand.description }}</p>
+                    }
+                  </li>
+                }
+              </ul>
+            } @else {
+              <div class="mt-3">
+                <app-catalog-state kind="empty" message="No brands are available." />
+              </div>
+            }
+          </section>
+        </div>
+      }
+    </main>
+  `,
+})
+export class CatalogPageComponent {
+  private readonly catalogApi = inject(CatalogApiService);
+  private readonly destroyRef = inject(DestroyRef);
+
+  protected readonly categories = signal<Category[]>([]);
+  protected readonly brands = signal<Brand[]>([]);
+  protected readonly isLoading = signal(true);
+  protected readonly hasError = signal(false);
+  protected readonly isEmpty = computed(
+    () => !this.isLoading() && !this.hasError() && !this.categories().length && !this.brands().length,
+  );
+
+  constructor() {
+    afterNextRender(() => this.loadCatalog());
+  }
+
+  private loadCatalog(): void {
+    forkJoin({
+      categories: this.catalogApi.getCategories(),
+      brands: this.catalogApi.getBrands(),
+    })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: ({ categories, brands }) => {
+          this.categories.set(categories);
+          this.brands.set(brands);
+          this.isLoading.set(false);
+        },
+        error: () => {
+          this.hasError.set(true);
+          this.isLoading.set(false);
