@@ -22,6 +22,12 @@ docker compose exec backend python manage.py migrate
 docker compose exec backend python manage.py createsuperuser
 ```
 
+## Development seed data
+
+```bash
+docker compose exec backend python manage.py seed_catalog
+```
+
 ## Chech backend:
 
 http://127.0.0.1:8000/
