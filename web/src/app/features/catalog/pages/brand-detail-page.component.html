@@ -1,12 +1,20 @@
-<main class="mx-auto max-w-3xl p-6">
-  @if (isLoading()) {
-    <app-catalog-state kind="loading" message="Loading brand..." />
-  } @else if (hasError()) {
-    <app-catalog-state kind="error" message="Unable to load the brand." />
-  } @else if (brand(); as brand) {
-    <h1 class="text-2xl font-semibold text-slate-900">{{ brand.name }}</h1>
-    @if (brand.description) {
-      <p class="mt-3 text-slate-600">{{ brand.description }}</p>
+<main class="min-h-screen bg-slate-950 px-5 py-12 text-slate-100 sm:px-8 sm:py-16">
+  <div class="mx-auto max-w-4xl">
+    @if (isLoading()) {
+      <app-catalog-state kind="loading" message="Loading brand..." />
+    } @else if (hasError()) {
+      <app-catalog-state kind="error" message="Unable to load the brand." />
+    } @else if (brand(); as brand) {
+      <article class="rounded-2xl border border-slate-800 bg-slate-900 px-6 py-8 sm:px-10 sm:py-12">
+        <h1 class="break-words text-3xl font-semibold tracking-tight text-slate-50 sm:text-4xl">
+          {{ brand.name }}
+        </h1>
+        @if (brand.description) {
+          <p class="mt-5 max-w-prose break-words text-base leading-7 text-slate-300">
+            {{ brand.description }}
+          </p>
+        }
+      </article>
     }
-  }
+  </div>
 </main>

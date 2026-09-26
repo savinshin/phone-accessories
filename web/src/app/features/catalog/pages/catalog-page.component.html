@@ -1,75 +1,88 @@
-<main class="mx-auto max-w-3xl p-6">
-  <h1 class="text-2xl font-semibold text-slate-900">Catalog</h1>
+<main class="min-h-screen bg-slate-950 px-5 py-12 text-slate-100 sm:px-8 sm:py-16">
+  <div class="mx-auto max-w-6xl">
+    <header class="border-b border-slate-800 pb-8 sm:pb-10">
+      <h1 class="text-4xl font-semibold tracking-tight text-sky-100 sm:text-5xl">Catalog</h1>
+      <p class="mt-4 max-w-prose text-base leading-7 text-slate-300">
+        Categories and brands in one place.
+      </p>
+    </header>
 
-  @if (isLoading()) {
-    <div class="mt-6">
-      <app-catalog-state kind="loading" message="Loading catalog..." />
-    </div>
-  } @else if (hasError()) {
-    <div class="mt-6">
-      <app-catalog-state kind="error" message="Unable to load the catalog." />
-    </div>
-  } @else if (isEmpty()) {
-    <div class="mt-6">
-      <app-catalog-state kind="empty" message="The catalog is empty." />
-    </div>
-  } @else {
-    <div class="mt-8 grid gap-8 md:grid-cols-2">
-      <section aria-labelledby="catalog-categories-heading">
-        <h2 id="catalog-categories-heading" class="text-lg font-medium text-slate-900">
-          Categories
-        </h2>
+    @if (isLoading()) {
+      <div class="mt-10">
+        <app-catalog-state kind="loading" message="Loading catalog..." />
+      </div>
+    } @else if (hasError()) {
+      <div class="mt-10">
+        <app-catalog-state kind="error" message="Unable to load the catalog." />
+      </div>
+    } @else if (isEmpty()) {
+      <div class="mt-10">
+        <app-catalog-state kind="empty" message="The catalog is empty." />
+      </div>
+    } @else {
+      <div class="mt-12 grid gap-12 lg:grid-cols-2 lg:gap-16">
+        <section aria-labelledby="catalog-categories-heading" class="min-w-0">
+          <h2
+            id="catalog-categories-heading"
+            class="border-b border-slate-800 pb-4 text-2xl font-semibold tracking-tight text-slate-100"
+          >
+            Categories
+          </h2>
 
-        @if (categories().length) {
-          <ul class="mt-3 space-y-3">
-            @for (category of categories(); track category.id) {
-              <li>
-                <a
-                  class="block text-slate-900 underline"
-                  [routerLink]="['/catalog/categories', category.slug]"
-                >
-                  {{ category.name }}
-                </a>
-                @if (category.description) {
-                  <p class="mt-1 text-sm text-slate-600">{{ category.description }}</p>
-                }
-              </li>
-            }
-          </ul>
-        } @else {
-          <div class="mt-3">
-            <app-catalog-state kind="empty" message="No categories are available." />
-          </div>
-        }
-      </section>
+          @if (categories().length) {
+            <ul class="mt-5 space-y-3">
+              @for (category of categories(); track category.id) {
+                <li>
+                  <a
+                    class="block min-h-20 rounded-xl border border-slate-800 bg-slate-900 px-5 py-4 transition-colors hover:border-sky-700 hover:bg-slate-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
+                    [routerLink]="['/catalog/categories', category.slug]"
+                  >
+                    <span class="block break-words text-lg font-medium text-slate-100">{{ category.name }}</span>
+                    @if (category.description) {
+                      <span class="mt-1 block break-words text-sm leading-6 text-slate-300">{{ category.description }}</span>
+                    }
+                  </a>
+                </li>
+              }
+            </ul>
+          } @else {
+            <div class="mt-5">
+              <app-catalog-state kind="empty" message="No categories are available." />
+            </div>
+          }
+        </section>
 
-      <section aria-labelledby="catalog-brands-heading">
-        <h2 id="catalog-brands-heading" class="text-lg font-medium text-slate-900">
-          Brands
-        </h2>
+        <section aria-labelledby="catalog-brands-heading" class="min-w-0">
+          <h2
+            id="catalog-brands-heading"
+            class="border-b border-slate-800 pb-4 text-2xl font-semibold tracking-tight text-slate-100"
+          >
+            Brands
+          </h2>
 
-        @if (brands().length) {
-          <ul class="mt-3 space-y-3">
-            @for (brand of brands(); track brand.id) {
-              <li>
-                <a
-                  class="block text-slate-900 underline"
-                  [routerLink]="['/catalog/brands', brand.slug]"
-                >
-                  {{ brand.name }}
-                </a>
-                @if (brand.description) {
-                  <p class="mt-1 text-sm text-slate-600">{{ brand.description }}</p>
-                }
-              </li>
-            }
-          </ul>
-        } @else {
-          <div class="mt-3">
-            <app-catalog-state kind="empty" message="No brands are available." />
-          </div>
-        }
-      </section>
-    </div>
-  }
+          @if (brands().length) {
+            <ul class="mt-5 space-y-3">
+              @for (brand of brands(); track brand.id) {
+                <li>
+                  <a
+                    class="block min-h-20 rounded-xl border border-slate-800 bg-slate-900 px-5 py-4 transition-colors hover:border-sky-700 hover:bg-slate-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
+                    [routerLink]="['/catalog/brands', brand.slug]"
+                  >
+                    <span class="block break-words text-lg font-medium text-slate-100">{{ brand.name }}</span>
+                    @if (brand.description) {
+                      <span class="mt-1 block break-words text-sm leading-6 text-slate-300">{{ brand.description }}</span>
+                    }
+                  </a>
+                </li>
+              }
+            </ul>
+          } @else {
+            <div class="mt-5">
+              <app-catalog-state kind="empty" message="No brands are available." />
+            </div>
+          }
+        </section>
+      </div>
+    }
+  </div>
 </main>
