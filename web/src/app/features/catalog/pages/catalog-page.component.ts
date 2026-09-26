@@ -120,3 +120,7 @@ export class CatalogPageComponent {
         error: () => {
           this.hasError.set(true);
           this.isLoading.set(false);
+        },
+      });
+  }
+}

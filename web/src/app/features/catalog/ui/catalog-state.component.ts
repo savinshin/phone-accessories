@@ -11,7 +11,7 @@ type CatalogStateKind = 'loading' | 'empty' | 'error';
     } @else if (kind() === 'loading') {
       <p class="text-sm text-slate-600" role="status">{{ message() }}</p>
     } @else {
-      <p class="text-sm text-slate-600">{{ message() }}</p>
+      <p class="text-sm text-slate-600" role="status">{{ message() }}</p>
     }
   `,
 })

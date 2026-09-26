@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, afterNextRender, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
-import { distinctUntilChanged, map } from 'rxjs';
+import { catchError, distinctUntilChanged, EMPTY, map, switchMap } from 'rxjs';
 
 import { CatalogApiService } from '../data-access/catalog-api.service';
 import { Brand } from '../data-access/catalog.types';
@@ -41,29 +41,26 @@ export class BrandDetailPageComponent {
         .pipe(
           map((params) => params.get('slug')!),
           distinctUntilChanged(),
+          switchMap((slug) => {
+            this.brand.set(null);
+            this.hasError.set(false);
+            this.isLoading.set(true);
+
+            return this.catalogApi.getBrand(slug).pipe(
+              catchError(() => {
+                this.hasError.set(true);
+                this.isLoading.set(false);
+
+                return EMPTY;
+              }),
+            );
+          }),
           takeUntilDestroyed(this.destroyRef),
         )
-        .subscribe((slug) => this.loadBrand(slug));
-    });
-  }
-
-  private loadBrand(slug: string): void {
-    this.brand.set(null);
-    this.hasError.set(false);
-    this.isLoading.set(true);
-
-    this.catalogApi
-      .getBrand(slug)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (brand) => {
+        .subscribe((brand) => {
           this.brand.set(brand);
           this.isLoading.set(false);
-        },
-        error: () => {
-          this.hasError.set(true);
-          this.isLoading.set(false);
-        },
-      });
+        });
+    });
   }
 }
