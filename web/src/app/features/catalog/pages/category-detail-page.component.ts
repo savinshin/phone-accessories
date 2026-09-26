@@ -11,20 +11,7 @@ import { CatalogStateComponent } from '../ui/catalog-state.component';
   selector: 'app-category-detail-page',
   imports: [CatalogStateComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    <main class="mx-auto max-w-3xl p-6">
-      @if (isLoading()) {
-        <app-catalog-state kind="loading" message="Loading category..." />
-      } @else if (hasError()) {
-        <app-catalog-state kind="error" message="Unable to load the category." />
-      } @else if (category(); as category) {
-        <h1 class="text-2xl font-semibold text-slate-900">{{ category.name }}</h1>
-        @if (category.description) {
-          <p class="mt-3 text-slate-600">{{ category.description }}</p>
-        }
-      }
-    </main>
-  `,
+  templateUrl: './category-detail-page.component.html',
 })
 export class CategoryDetailPageComponent {
   private readonly route = inject(ActivatedRoute);

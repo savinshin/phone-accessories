@@ -11,20 +11,7 @@ import { CatalogStateComponent } from '../ui/catalog-state.component';
   selector: 'app-brand-detail-page',
   imports: [CatalogStateComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    <main class="mx-auto max-w-3xl p-6">
-      @if (isLoading()) {
-        <app-catalog-state kind="loading" message="Loading brand..." />
-      } @else if (hasError()) {
-        <app-catalog-state kind="error" message="Unable to load the brand." />
-      } @else if (brand(); as brand) {
-        <h1 class="text-2xl font-semibold text-slate-900">{{ brand.name }}</h1>
-        @if (brand.description) {
-          <p class="mt-3 text-slate-600">{{ brand.description }}</p>
-        }
-      }
-    </main>
-  `,
+  templateUrl: './brand-detail-page.component.html',
 })
 export class BrandDetailPageComponent {
   private readonly route = inject(ActivatedRoute);
