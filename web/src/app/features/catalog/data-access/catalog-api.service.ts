@@ -1,8 +1,8 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { Brand, Category } from './catalog.types';
+import { Brand, Category, ProductDetail, ProductListItem } from './catalog.types';
 
 @Injectable({ providedIn: 'root' })
 export class CatalogApiService {
@@ -22,5 +22,23 @@ export class CatalogApiService {
 
   getBrand(slug: string): Observable<Brand> {
     return this.http.get<Brand>('/api/catalog/brands/' + slug + '/');
+  }
+
+  getProducts(category: string | null, brand: string | null): Observable<ProductListItem[]> {
+    let params = new HttpParams();
+
+    if (category) {
+      params = params.set('category', category);
+    }
+
+    if (brand) {
+      params = params.set('brand', brand);
+    }
+
+    return this.http.get<ProductListItem[]>('/api/catalog/products/', { params });
+  }
+
+  getProduct(slug: string): Observable<ProductDetail> {
+    return this.http.get<ProductDetail>('/api/catalog/products/' + slug + '/');
   }
 }

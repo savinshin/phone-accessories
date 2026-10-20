@@ -22,4 +22,11 @@ export const routes: Routes = [
         (component) => component.BrandDetailPageComponent,
       ),
   },
+  {
+    path: 'catalog/products/:slug',
+    loadComponent: () =>
+      import('./features/catalog/pages/product-detail-page.component').then(
+        (component) => component.ProductDetailPageComponent,
+      ),
+  },
 ];
