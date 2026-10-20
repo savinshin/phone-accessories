@@ -61,15 +61,11 @@ class ProductListSerializer(serializers.ModelSerializer):
         )
 
     def get_default_variant(self, obj):
-        variant = obj.productvariant_set.filter(
-            is_default=True,
-            is_active=True,
-        ).first()
+        for variant in obj.productvariant_set.all():
+            if variant.is_default:
+                return ProductVariantShortSerializer(variant).data
 
-        if variant is None:
-            return None
-
-        return ProductVariantShortSerializer(variant).data
+        return None
 
 
 class ProductCategorySerializer(serializers.ModelSerializer):
@@ -103,6 +99,7 @@ class ProductVariantDetailSerializer(serializers.ModelSerializer):
 
 class ProductDetailSerializer(serializers.ModelSerializer):
     brand = BrandShortSerializer(read_only=True)
+    default_variant = serializers.SerializerMethodField()
 
     categories = ProductCategorySerializer(
         source="productcategory_set",
@@ -124,6 +121,14 @@ class ProductDetailSerializer(serializers.ModelSerializer):
             "slug",
             "description",
             "brand",
+            "default_variant",
             "categories",
             "variants",
         )
+
+    def get_default_variant(self, obj):
+        for variant in obj.productvariant_set.all():
+            if variant.is_default:
+                return ProductVariantShortSerializer(variant).data
+
+        return None
