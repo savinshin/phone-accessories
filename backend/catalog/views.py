@@ -53,11 +53,13 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
         return ProductDetailSerializer
 
     def get_queryset(self):
-        queryset = self.queryset
+        queryset = super().get_queryset()
 
         brand_slug = self.request.query_params.get("brand")
         if brand_slug:
-            queryset = queryset.filter(brand__slug=brand_slug)
+            queryset = queryset.filter(
+                brand__slug=brand_slug,
+            )
 
         category_slug = self.request.query_params.get("category")
         if category_slug:
