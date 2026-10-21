@@ -1,3 +1,5 @@
+from enum import unique
+
 from django.db import models
 from django.db.models import F, Q
 
@@ -120,3 +122,58 @@ class ProductVariant(models.Model):
 
     def __str__(self):
         return self.sku
+
+
+class Attribute(models.Model):
+    class DataType(models.TextChoices):
+        TEXT = "text", "Text"
+        INTEGER = "integer", "Integer"
+        DECIMAL = "decimal", "Decimal"
+        BOOLEAN = "boolean", "Boolean"
+        OPTION = "option", "Option"
+
+    name = models.CharField(max_length=255)
+    slug = models.SlugField(max_length=255, unique=True)
+    data_type = models.CharField(max_length=20, choices=DataType.choices)
+    unit = models.CharField(max_length=64, blank=True)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+
+class AttributeOption(models.Model):
+    attribute = models.ForeignKey("Attribute", on_delete=models.CASCADE)
+    value = models.CharField(max_length=255)
+    is_active = models.BooleanField(default=True)
+    sort_order = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["attribute", "value"],
+                name="unique_attribute_value"
+            )
+        ]
+
+
+class CategoryAttribute(models.Model):
+    class Scope(models.TextChoices):
+        PRODUCT = "product", "Product"
+        VARIANT = "variant", "Variant"
+
+    category = models.ForeignKey("Category", on_delete=models.CASCADE)
+    attribute = models.ForeignKey("Attribute", on_delete=models.PROTECT)
+    scope = models.CharField(max_length=20, choices=Scope.choices)
+    is_required = models.BooleanField(default=False)
+    is_filterable = models.BooleanField(default=False)
+    sort_order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["category", "attribute"],
+                name="unique_category_attribute"
+            )
+        ]
