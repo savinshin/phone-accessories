@@ -1,5 +1,3 @@
-from enum import unique
-
 from django.db import models
 from django.db.models import F, Q
 
@@ -153,8 +151,8 @@ class AttributeOption(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=["attribute", "value"],
-                name="unique_attribute_value"
-            )
+                name="unique_attribute_value",
+            ),
         ]
 
 
@@ -174,6 +172,6 @@ class CategoryAttribute(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=["category", "attribute"],
-                name="unique_category_attribute"
-            )
+                name="unique_category_attribute",
+            ),
         ]
