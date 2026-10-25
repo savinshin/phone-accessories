@@ -3,8 +3,9 @@ from rest_framework import viewsets
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from .models import Category, Brand, Product, ProductVariant, ProductCategory
-from .serializers import CategorySerializer, BrandSerializer, ProductListSerializer, ProductDetailSerializer
+from .models import Category, Brand, Product, ProductVariant, ProductCategory, CategoryAttribute, AttributeOption
+from .serializers import CategorySerializer, BrandSerializer, ProductListSerializer, ProductDetailSerializer, \
+    CategoryDetailSerializer
 
 
 @api_view(['GET'])
@@ -14,8 +15,34 @@ def health_check(request):
 
 class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = CategorySerializer
-    queryset = Category.objects.filter(is_active=True).order_by('sort_order', 'name')
+    queryset = (
+        Category.objects.filter(is_active=True)
+        .prefetch_related(
+            Prefetch(
+                "categoryattribute_set",
+                queryset=CategoryAttribute.objects.filter(
+                    attribute__is_active=True,
+                )
+                .select_related("attribute")
+                .prefetch_related(
+                    Prefetch(
+                        "attribute__attributeoption_set",
+                        queryset=AttributeOption.objects.filter(
+                            is_active=True,
+                        ).order_by("sort_order"),
+                    )
+                )
+                .order_by("sort_order", "attribute__name"),
+            )
+        )
+        .order_by("sort_order", "name")
+    )
     lookup_field = 'slug'
+
+    def get_serializer_class(self):
+        if self.action == "list":
+            return CategorySerializer
+        return CategoryDetailSerializer
 
 
 class BrandViewSet(viewsets.ReadOnlyModelViewSet):

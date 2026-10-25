@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
-from .models import Category, Brand, Product, ProductVariant, ProductCategory
+from .models import Category, Brand, Product, ProductVariant, ProductCategory, AttributeOption, CategoryAttribute, \
+    Attribute
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -12,6 +13,67 @@ class CategorySerializer(serializers.ModelSerializer):
                   'slug',
                   'description',
                   'sort_order'
+        )
+
+
+class AttributeOptionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AttributeOption
+        fields = (
+            "id",
+            "value",
+            "sort_order",
+        )
+
+
+class CategoryAttributeSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(source="attribute.id", read_only=True)
+    name = serializers.CharField(source="attribute.name", read_only=True)
+    slug = serializers.CharField(source="attribute.slug", read_only=True)
+    data_type = serializers.CharField(source="attribute.data_type", read_only=True)
+    unit = serializers.CharField(source="attribute.unit", read_only=True)
+
+    options = serializers.SerializerMethodField()
+
+    class Meta:
+        model = CategoryAttribute
+        fields = (
+            "id",
+            "name",
+            "slug",
+            "data_type",
+            "unit",
+            "scope",
+            "is_required",
+            "is_filterable",
+            "sort_order",
+            "options",
+        )
+
+    def get_options(self, obj):
+        if obj.attribute.data_type != Attribute.DataType.OPTION:
+            return []
+
+        return AttributeOptionSerializer(
+            obj.attribute.attributeoption_set.filter(
+                is_active=True,
+            ).order_by(
+                "sort_order",
+            ),
+            many=True,
+        ).data
+
+
+class CategoryDetailSerializer(CategorySerializer):
+    attributes = CategoryAttributeSerializer(
+        source="categoryattribute_set",
+        many=True,
+        read_only=True,
+    )
+
+    class Meta(CategorySerializer.Meta):
+        fields = CategorySerializer.Meta.fields + (
+            "attributes",
         )
 
 
