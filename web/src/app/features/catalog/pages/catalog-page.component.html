@@ -1,37 +1,35 @@
-<main class="min-h-screen bg-slate-950 px-5 py-12 text-slate-100 sm:px-8 sm:py-16">
-  <div class="mx-auto max-w-6xl">
-    <header class="border-b border-slate-800 pb-8 sm:pb-10">
-      <h1 class="text-4xl font-semibold tracking-tight text-sky-100 sm:text-5xl">Catalog</h1>
-      <p class="mt-4 max-w-prose text-base leading-7 text-slate-300">
+<main class="min-h-screen bg-slate-950 px-5 py-10 text-slate-100 selection:bg-slate-600 selection:text-white sm:px-8 sm:py-14">
+  <div class="mx-auto max-w-7xl">
+    <header class="border-b border-slate-800 pb-7 sm:pb-9">
+      <h1 class="text-4xl font-semibold tracking-tight text-slate-50 sm:text-5xl">Catalog</h1>
+      <p class="mt-3 max-w-prose text-base leading-7 text-slate-300">
         Categories and brands in one place.
       </p>
     </header>
 
-    <section aria-labelledby="catalog-navigation-heading" class="mt-10">
-      <h2 id="catalog-navigation-heading" class="text-2xl font-semibold tracking-tight text-slate-100">
-        Browse catalog
-      </h2>
+    <section aria-labelledby="catalog-navigation-heading" class="mt-8 sm:mt-10">
+      <h2 id="catalog-navigation-heading" class="text-lg font-semibold text-slate-100">Browse catalog</h2>
 
       @if (navigationIsLoading()) {
-        <div class="mt-5">
+        <div class="mt-4 [&_p]:min-h-32 [&_p]:py-7">
           <app-catalog-state kind="loading" message="Loading catalog navigation..." />
         </div>
       } @else if (navigationHasError()) {
-        <div class="mt-5">
+        <div class="mt-4 [&_p]:min-h-32 [&_p]:py-7">
           <app-catalog-state kind="error" message="Unable to load catalog navigation." />
         </div>
       } @else if (navigationIsEmpty()) {
-        <div class="mt-5">
+        <div class="mt-4 [&_p]:min-h-32 [&_p]:py-7">
           <app-catalog-state kind="empty" message="No categories or brands are available." />
         </div>
       } @else {
-        <div class="mt-6 grid gap-5 rounded-xl border border-slate-800 bg-slate-900 p-5 sm:grid-cols-2">
+        <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:max-w-3xl">
           <div>
-            <label for="catalog-category-filter" class="block text-sm font-medium text-slate-200">Category</label>
+            <label for="catalog-category-filter" class="block text-sm font-medium text-slate-300">Category</label>
             <select
               id="catalog-category-filter"
               #categoryFilter
-              class="mt-2 block w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
+              class="mt-2 block min-h-12 w-full rounded-lg border border-slate-700 bg-slate-900 px-4 text-sm text-slate-100 transition-colors hover:border-slate-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
               [value]="selectedCategory()"
               (change)="updateCategoryFilter(categoryFilter.value)"
             >
@@ -43,11 +41,11 @@
           </div>
 
           <div>
-            <label for="catalog-brand-filter" class="block text-sm font-medium text-slate-200">Brand</label>
+            <label for="catalog-brand-filter" class="block text-sm font-medium text-slate-300">Brand</label>
             <select
               id="catalog-brand-filter"
               #brandFilter
-              class="mt-2 block w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
+              class="mt-2 block min-h-12 w-full rounded-lg border border-slate-700 bg-slate-900 px-4 text-sm text-slate-100 transition-colors hover:border-slate-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
               [value]="selectedBrand()"
               (change)="updateBrandFilter(brandFilter.value)"
             >
@@ -58,111 +56,105 @@
             </select>
           </div>
         </div>
+      }
+    </section>
 
-        <div class="mt-12 grid gap-12 lg:grid-cols-2 lg:gap-16">
+    <div class="mt-12 grid items-start gap-14 lg:mt-14 lg:grid-cols-[minmax(0,1fr)_18rem] lg:gap-14">
+      <section aria-labelledby="catalog-products-heading" class="min-w-0">
+        <h2 id="catalog-products-heading" class="border-b border-slate-700 pb-4 text-2xl font-semibold tracking-tight text-slate-50">Products</h2>
+
+        @if (productsIsLoading()) {
+          <div class="mt-5">
+            <app-catalog-state kind="loading" message="Loading products..." />
+          </div>
+        } @else if (productsHasError()) {
+          <div class="mt-5">
+            <app-catalog-state kind="error" message="Unable to load products." />
+          </div>
+        } @else if (productsIsEmpty()) {
+          <div class="mt-5">
+            <app-catalog-state kind="empty" message="No products match the selected filters." />
+          </div>
+        } @else {
+          <ul class="grid gap-x-7 sm:grid-cols-2">
+            @for (product of products(); track product.id) {
+              <li class="min-w-0 border-b border-slate-800">
+                <a
+                  class="group flex min-h-40 h-full flex-col items-start rounded-md px-2 py-6 transition-colors hover:bg-slate-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400 sm:px-3"
+                  [routerLink]="['/catalog/products', product.slug]"
+                >
+                  <span class="block break-words text-lg font-semibold leading-7 text-slate-100 group-hover:text-sky-200">{{ product.name }}</span>
+                  @if (product.brand; as brand) {
+                    <span class="mt-2 block break-words text-sm leading-6 text-slate-300">{{ brand.name }}</span>
+                  }
+                  @if (product.default_variant; as defaultVariant) {
+                    <span class="mt-auto block pt-5 text-sm text-slate-300">Price: <span class="text-xl font-semibold tabular-nums text-slate-50">{{ defaultVariant.price }}</span></span>
+                    @if (defaultVariant.compare_at_price) {
+                      <span class="mt-1 block text-sm tabular-nums text-slate-400">Compare at: {{ defaultVariant.compare_at_price }}</span>
+                    }
+                  }
+                </a>
+              </li>
+            }
+          </ul>
+        }
+      </section>
+
+      @if (!navigationIsLoading() && !navigationHasError() && !navigationIsEmpty()) {
+        <aside aria-label="Categories and brands" class="grid min-w-0 gap-10 border-t border-slate-800 pt-8 sm:grid-cols-2 lg:grid-cols-1 lg:gap-12 lg:border-t-0 lg:pt-0">
           <section aria-labelledby="catalog-categories-heading" class="min-w-0">
-            <h3
-              id="catalog-categories-heading"
-              class="border-b border-slate-800 pb-4 text-2xl font-semibold tracking-tight text-slate-100"
-            >
-              Categories
-            </h3>
+            <h2 id="catalog-categories-heading" class="border-b border-slate-700 pb-4 text-lg font-semibold text-slate-100">Categories</h2>
 
             @if (categories().length) {
-              <ul class="mt-5 space-y-3">
+              <ul>
                 @for (category of categories(); track category.id) {
-                  <li>
+                  <li class="border-b border-slate-800">
                     <a
-                      class="block min-h-20 rounded-xl border border-slate-800 bg-slate-900 px-5 py-4 transition-colors hover:border-sky-700 hover:bg-slate-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
+                      class="block rounded-md px-2 py-3 transition-colors hover:bg-slate-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
                       [routerLink]="['/catalog/categories', category.slug]"
                     >
-                      <span class="block break-words text-lg font-medium text-slate-100">{{ category.name }}</span>
+                      <span class="block break-words text-sm font-semibold leading-6 text-slate-100">{{ category.name }}</span>
                       @if (category.description) {
-                        <span class="mt-1 block break-words text-sm leading-6 text-slate-300">{{ category.description }}</span>
+                        <span class="mt-0.5 block break-words text-sm leading-6 text-slate-300">{{ category.description }}</span>
                       }
                     </a>
                   </li>
                 }
               </ul>
             } @else {
-              <div class="mt-5">
+              <div class="mt-4 [&_p]:min-h-28 [&_p]:px-4 [&_p]:py-5">
                 <app-catalog-state kind="empty" message="No categories are available." />
               </div>
             }
           </section>
 
           <section aria-labelledby="catalog-brands-heading" class="min-w-0">
-            <h3
-              id="catalog-brands-heading"
-              class="border-b border-slate-800 pb-4 text-2xl font-semibold tracking-tight text-slate-100"
-            >
-              Brands
-            </h3>
+            <h2 id="catalog-brands-heading" class="border-b border-slate-700 pb-4 text-lg font-semibold text-slate-100">Brands</h2>
 
             @if (brands().length) {
-              <ul class="mt-5 space-y-3">
+              <ul>
                 @for (brand of brands(); track brand.id) {
-                  <li>
+                  <li class="border-b border-slate-800">
                     <a
-                      class="block min-h-20 rounded-xl border border-slate-800 bg-slate-900 px-5 py-4 transition-colors hover:border-sky-700 hover:bg-slate-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
+                      class="block rounded-md px-2 py-3 transition-colors hover:bg-slate-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
                       [routerLink]="['/catalog/brands', brand.slug]"
                     >
-                      <span class="block break-words text-lg font-medium text-slate-100">{{ brand.name }}</span>
+                      <span class="block break-words text-sm font-semibold leading-6 text-slate-100">{{ brand.name }}</span>
                       @if (brand.description) {
-                        <span class="mt-1 block break-words text-sm leading-6 text-slate-300">{{ brand.description }}</span>
+                        <span class="mt-0.5 block break-words text-sm leading-6 text-slate-300">{{ brand.description }}</span>
                       }
                     </a>
                   </li>
                 }
               </ul>
             } @else {
-              <div class="mt-5">
+              <div class="mt-4 [&_p]:min-h-28 [&_p]:px-4 [&_p]:py-5">
                 <app-catalog-state kind="empty" message="No brands are available." />
               </div>
             }
           </section>
-        </div>
+        </aside>
       }
-    </section>
-
-    <section aria-labelledby="catalog-products-heading" class="mt-16">
-      <h2 id="catalog-products-heading" class="text-2xl font-semibold tracking-tight text-slate-100">Products</h2>
-
-      @if (productsIsLoading()) {
-        <div class="mt-5">
-          <app-catalog-state kind="loading" message="Loading products..." />
-        </div>
-      } @else if (productsHasError()) {
-        <div class="mt-5">
-          <app-catalog-state kind="error" message="Unable to load products." />
-        </div>
-      } @else if (productsIsEmpty()) {
-        <div class="mt-5">
-          <app-catalog-state kind="empty" message="No products match the selected filters." />
-        </div>
-      } @else {
-        <ul class="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          @for (product of products(); track product.id) {
-            <li>
-              <a
-                class="block h-full rounded-xl border border-slate-800 bg-slate-900 px-5 py-4 transition-colors hover:border-sky-700 hover:bg-slate-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
-                [routerLink]="['/catalog/products', product.slug]"
-              >
-                <span class="block break-words text-lg font-medium text-slate-100">{{ product.name }}</span>
-                @if (product.brand; as brand) {
-                  <span class="mt-2 block break-words text-sm text-slate-300">{{ brand.name }}</span>
-                }
-                @if (product.default_variant; as defaultVariant) {
-                  <span class="mt-4 block text-sm font-medium text-slate-100">Price: {{ defaultVariant.price }}</span>
-                  @if (defaultVariant.compare_at_price) {
-                    <span class="mt-1 block text-sm text-slate-400">Compare at: {{ defaultVariant.compare_at_price }}</span>
-                  }
-                }
-              </a>
-            </li>
-          }
-        </ul>
-      }
-    </section>
+    </div>
   </div>
 </main>
