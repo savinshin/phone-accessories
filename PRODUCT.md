@@ -32,7 +32,8 @@ Phone Accessories is a working name. The final brand and distinguishing commerci
 - Angular 22 and Tailwind CSS 4 are the existing frontend stack, with standalone components, OnPush, separate TypeScript/HTML, and SSR/hydration. API requests use relative `/api/...` paths.
 - Functional work and design work are separate passes. A design pass preserves API contracts, routes, query behavior, state, TypeScript application logic, and SSR/hydration. `AGENTS.md` remains the authority for implementation and command restrictions.
 - UI libraries, dependencies, design systems, and custom design tokens require a separate project decision.
-- Product media, stock, attributes, compatibility, cart, checkout, and payments are future capabilities. Do not present them as available before their dedicated implementation.
+- The catalog backend defines `Attribute`, `AttributeOption`, and `CategoryAttribute`. The Category detail API exposes category attribute definitions, including available options for option-type attributes. This metadata does not represent populated product or variant attribute values.
+- Product and variant attribute values, storefront specifications and attribute filtering, product media, stock, compatibility, cart, checkout, and payments are not yet implemented. Do not present them as available before their dedicated implementation.
 - Prices come from the API. The API does not provide a currency; do not add one or invent availability, specifications, images, or commercial promises.
 
 ## Brand Commitments
