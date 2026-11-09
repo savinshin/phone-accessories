@@ -138,6 +138,9 @@ class Attribute(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def __str__(self):
+        return self.name
+
 
 class AttributeOption(models.Model):
     attribute = models.ForeignKey("Attribute", on_delete=models.CASCADE)

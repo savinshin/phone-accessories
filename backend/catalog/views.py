@@ -30,6 +30,7 @@ class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
                         queryset=AttributeOption.objects.filter(
                             is_active=True,
                         ).order_by("sort_order"),
+                        to_attr="active_options",
                     )
                 )
                 .order_by("sort_order", "attribute__name"),
