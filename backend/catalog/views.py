@@ -38,7 +38,7 @@ class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
         )
         .order_by("sort_order", "name")
     )
-    lookup_field = 'slug'
+    lookup_field = "slug"
 
     def get_serializer_class(self):
         if self.action == "list":
