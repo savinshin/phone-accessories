@@ -55,11 +55,7 @@ class CategoryAttributeSerializer(serializers.ModelSerializer):
             return []
 
         return AttributeOptionSerializer(
-            obj.attribute.attributeoption_set.filter(
-                is_active=True,
-            ).order_by(
-                "sort_order",
-            ),
+            obj.attribute.active_options,
             many=True,
         ).data
 

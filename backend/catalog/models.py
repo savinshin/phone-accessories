@@ -138,6 +138,9 @@ class Attribute(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def __str__(self):
+        return self.name
+
 
 class AttributeOption(models.Model):
     attribute = models.ForeignKey("Attribute", on_delete=models.CASCADE)
@@ -174,4 +177,109 @@ class CategoryAttribute(models.Model):
                 fields=["category", "attribute"],
                 name="unique_category_attribute",
             ),
+        ]
+
+
+TYPED_VALUE_FIELDS = (
+    "value_text",
+    "value_integer",
+    "value_decimal",
+    "value_boolean",
+    "option",
+)
+
+
+def exactly_one_value_check(name: str) -> models.CheckConstraint:
+    branches = Q()
+
+    for field in TYPED_VALUE_FIELDS:
+        condition = Q(**{f"{field}__isnull": False})
+
+        for other in TYPED_VALUE_FIELDS:
+            if other != field:
+                condition &= Q(**{f"{other}__isnull": True})
+
+        branches |= condition
+
+    return models.CheckConstraint(
+        condition=branches,
+        name=name,
+    )
+
+
+class ProductAttributeValue(models.Model):
+    product = models.ForeignKey(
+        "Product",
+        on_delete=models.CASCADE,
+        related_name="attribute_values",
+    )
+    attribute = models.ForeignKey(
+        "Attribute",
+        on_delete=models.PROTECT,
+        related_name="product_values",
+    )
+
+    value_text = models.TextField(null=True, blank=True)
+    value_integer = models.IntegerField(null=True, blank=True)
+    value_decimal = models.DecimalField(
+        max_digits=12,
+        decimal_places=4,
+        null=True,
+        blank=True,
+    )
+    value_boolean = models.BooleanField(null=True, blank=True)
+    option = models.ForeignKey(
+        "AttributeOption",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="product_values",
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["product", "attribute"],
+                name="unique_product_attribute_value",
+            ),
+            exactly_one_value_check("product_attribute_value_exactly_one_value"),
+        ]
+
+
+class VariantAttributeValue(models.Model):
+    variant = models.ForeignKey(
+        "ProductVariant",
+        on_delete=models.CASCADE,
+        related_name="attribute_values",
+    )
+    attribute = models.ForeignKey(
+        "Attribute",
+        on_delete=models.PROTECT,
+        related_name="variant_values",
+    )
+
+    value_text = models.TextField(null=True, blank=True)
+    value_integer = models.IntegerField(null=True, blank=True)
+    value_decimal = models.DecimalField(
+        max_digits=12,
+        decimal_places=4,
+        null=True,
+        blank=True,
+    )
+    value_boolean = models.BooleanField(null=True, blank=True)
+    option = models.ForeignKey(
+        "AttributeOption",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="variant_values",
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["variant", "attribute"],
+                name="unique_variant_attribute_value",
+            ),
+            exactly_one_value_check("variant_attribute_value_exactly_one_value"),
         ]
