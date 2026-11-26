@@ -1,5 +1,6 @@
 from django.db import models
 from django.db.models import F, Q
+from django.core.exceptions import ValidationError
 
 
 class Category(models.Model):
@@ -207,7 +208,48 @@ def exactly_one_value_check(name: str) -> models.CheckConstraint:
     )
 
 
-class ProductAttributeValue(models.Model):
+class TypedValueValidationMixin:
+    EXPECTED_FIELDS = {
+        Attribute.DataType.TEXT: "value_text",
+        Attribute.DataType.INTEGER: "value_integer",
+        Attribute.DataType.DECIMAL: "value_decimal",
+        Attribute.DataType.BOOLEAN: "value_boolean",
+        Attribute.DataType.OPTION: "option",
+    }
+
+    def clean(self):
+        super().clean()
+
+        if not self.attribute_id:
+            return
+
+        expected_field = self.EXPECTED_FIELDS[self.attribute.data_type]
+
+        if getattr(self, expected_field) is None:
+            raise ValidationError(
+                {
+                    expected_field: (
+                        f"This field is required for "
+                        f"{self.attribute.get_data_type_display().lower()} attributes."
+                    )
+                }
+            )
+
+        if (
+            self.attribute.data_type == Attribute.DataType.OPTION
+            and self.option is not None
+            and self.option.attribute_id != self.attribute_id
+        ):
+            raise ValidationError(
+                {
+                    "option": (
+                        "Selected option must belong to the selected attribute."
+                    )
+                }
+            )
+
+
+class ProductAttributeValue(TypedValueValidationMixin, models.Model):
     product = models.ForeignKey(
         "Product",
         on_delete=models.CASCADE,
@@ -246,7 +288,7 @@ class ProductAttributeValue(models.Model):
         ]
 
 
-class VariantAttributeValue(models.Model):
+class VariantAttributeValue(TypedValueValidationMixin, models.Model):
     variant = models.ForeignKey(
         "ProductVariant",
         on_delete=models.CASCADE,

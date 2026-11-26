@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from .models import Category, Brand, Product, ProductVariant, ProductCategory, AttributeOption, CategoryAttribute, \
-    Attribute
+    Attribute, ProductAttributeValue
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -141,7 +141,57 @@ class ProductCategorySerializer(serializers.ModelSerializer):
         )
 
 
+class AttributeValueSerializer(serializers.ModelSerializer):
+    attribute = serializers.SerializerMethodField()
+    value = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ProductAttributeValue
+        fields = (
+            "attribute",
+            "value",
+        )
+
+    def get_attribute(self, obj):
+        return {
+            "id": obj.attribute.id,
+            "name": obj.attribute.name,
+            "slug": obj.attribute.slug,
+            "data_type": obj.attribute.data_type,
+            "unit": obj.attribute.unit,
+        }
+
+    def get_value(self, obj):
+        data_type = obj.attribute.data_type
+
+        if data_type == Attribute.DataType.TEXT:
+            return obj.value_text
+
+        if data_type == Attribute.DataType.INTEGER:
+            return obj.value_integer
+
+        if data_type == Attribute.DataType.DECIMAL:
+            return str(obj.value_decimal)
+
+        if data_type == Attribute.DataType.BOOLEAN:
+            return obj.value_boolean
+
+        if data_type == Attribute.DataType.OPTION:
+            return {
+                "id": obj.option.id,
+                "value": obj.option.value,
+            }
+
+        return None
+
+
 class ProductVariantDetailSerializer(serializers.ModelSerializer):
+    attributes = AttributeValueSerializer(
+        source="attribute_values",
+        many=True,
+        read_only=True,
+    )
+
     class Meta:
         model = ProductVariant
         fields = (
@@ -152,6 +202,7 @@ class ProductVariantDetailSerializer(serializers.ModelSerializer):
             "compare_at_price",
             "is_default",
             "sort_order",
+            "attributes",
         )
 
 
@@ -171,6 +222,12 @@ class ProductDetailSerializer(serializers.ModelSerializer):
         read_only=True,
     )
 
+    attributes = AttributeValueSerializer(
+        source="attribute_values",
+        many=True,
+        read_only=True,
+    )
+
     class Meta:
         model = Product
         fields = (
@@ -182,6 +239,7 @@ class ProductDetailSerializer(serializers.ModelSerializer):
             "default_variant",
             "categories",
             "variants",
+            "attributes",
         )
 
     def get_default_variant(self, obj):
